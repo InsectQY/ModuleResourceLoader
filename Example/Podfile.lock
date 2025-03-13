@@ -1,0 +1,16 @@
+PODS:
+  - ModuleResourceLoader (1.0.0)
+
+DEPENDENCIES:
+  - ModuleResourceLoader (from `../`)
+
+EXTERNAL SOURCES:
+  ModuleResourceLoader:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  ModuleResourceLoader: 53cc7cca6f689b74ea225683705cabdbdfdc2c8b
+
+PODFILE CHECKSUM: 04654c5c2aa878de76bcfbbf9f333baad7afcf3b
+
+COCOAPODS: 1.16.2
