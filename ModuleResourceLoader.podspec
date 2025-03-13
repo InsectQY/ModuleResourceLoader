@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'LeslieChen' => '704861917@qq.com' }
   s.source           = { :git => 'https://github.com/InsectQY/ModuleResourceLoader.git', :tag => s.version.to_s }
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '12.0'
   s.source_files = 'ModuleResourceLoader/Classes/**/*'
   s.frameworks = 'UIKit'
 end
