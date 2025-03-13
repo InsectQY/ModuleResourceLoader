@@ -22,7 +22,7 @@ pod 'ModuleResourceLoader'
 
 ## Author
 
-oauth2, 704861917@qq.com
+LeslieChen
 
 ## License
 
