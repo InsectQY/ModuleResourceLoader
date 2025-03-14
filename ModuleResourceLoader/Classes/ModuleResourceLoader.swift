@@ -8,13 +8,17 @@ public final class ModuleResourceLoader {
     
     // MARK: - Public API
     
-    /// 通过类型获取模块资源 Bundle（推荐在类型明确的场景使用）
+    /// 获取模块资源 Bundle (根据 Type 动态获取模块名称)
+    /// - Parameter type: Self.self
+    /// - Returns: Bundle
     public static func currentBundle(for type: Any.Type) -> Bundle? {
         let moduleName = moduleName(for: type)
         return currentBundle(for: moduleName)
     }
     
-    /// 直接通过模块名获取资源 Bundle（高性能版本）
+    /// 获取模块资源 Bundle（高性能版本）
+    /// - Parameter moduleName: 模块名称
+    /// - Returns: Bundle
     public static func currentBundle(for moduleName: String) -> Bundle? {
         if let cached = bundleCache.object(forKey: moduleName as NSString) {
             return cached
@@ -37,10 +41,22 @@ public final class ModuleResourceLoader {
     }
     
     // MARK: 图片加载扩展
+        
+    /// 加载 Assets 中的图片(根据 Type 动态获取模块名称)
+    /// - Parameters:
+    ///   - imageName: 图片名称
+    ///   - type: Self.self
+    /// - Returns: UIImage
     public static func loadImage(named imageName: String, for type: Any.Type) -> UIImage? {
         return loadImage(named: imageName, forModule: moduleName(for: type))
     }
     
+    
+    /// 加载 Assets 中的图片(高性能版本)
+    /// - Parameters:
+    ///   - imageName: 图片名称
+    ///   - module: 模块名称
+    /// - Returns: UIImage
     public static func loadImage(named imageName: String, forModule module: String) -> UIImage? {
         guard let bundle = currentBundle(for: module) else {
             #if DEBUG
@@ -52,16 +68,26 @@ public final class ModuleResourceLoader {
     }
     
     // MARK: XIB 加载扩展
-    public static func loadView<T: UIView>(templateName: String) -> T {
-        return loadView(templateName: templateName, forModule: moduleName(for: T.self))
+    
+    /// 加载 UIView 类型的 Xib (根据 Type 动态获取模块名称)
+    /// - Parameter name: T 的类型
+    /// - Returns: T
+    public static func loadViewFromNib<T: UIView>(withClass name: T.Type) -> T {
+        return loadViewFromNib(withClass: name, forModule: moduleName(for: T.self))
     }
     
-    public static func loadView<T: UIView>(templateName: String, forModule module: String) -> T {
+    /// 加载 UIView 类型的 Xib (高性能版本)
+    /// - Parameters:
+    ///   - name: T 的类型
+    ///   - module: 模块名称
+    /// - Returns: T
+    public static func loadViewFromNib<T: UIView>(withClass name: T.Type, forModule module: String) -> T {
+        let named = String(describing: name)
         guard let bundle = currentBundle(for: module),
-              let view = bundle.loadNibNamed(templateName, owner: nil)?.first as? T else {
+              let view = bundle.loadNibNamed(String(describing: name), owner: nil)?.first as? T else {
             #if DEBUG
             fatalError("""
-                🛑 无法加载 \(templateName) 请检查:
+                🛑 无法加载 \(named) 请检查:
                 1. XIB 文件名是否与模板名称一致
                 2. Bundle 结构是否符合组件化规范
                 3. 是否在正确的 Target 中添加资源文件
@@ -71,6 +97,35 @@ public final class ModuleResourceLoader {
             #endif
         }
         return view
+    }
+    
+    /// 加载 UINib (根据 type 获取)
+    /// - Parameter name: T 的类型
+    /// - Returns: UINib
+    public static func loadNib<T: UIView>(withClass name: T.Type) -> UINib? {
+        return loadNib(withClass: name, forModule: moduleName(for: T.self))
+    }
+    
+    /// 加载 UINib (高性能版本)
+    /// - Parameters:
+    ///   - name: T 的类型
+    ///   - module: 模块名称
+    /// - Returns: UINib
+    public static func loadNib<T: UIView>(withClass name: T.Type, forModule module: String) -> UINib? {
+        let named = String(describing: name)
+        guard let bundle = currentBundle(for: module),
+              let view = bundle.loadNibNamed(String(describing: name), owner: nil)?.first as? T else {
+            #if DEBUG
+            fatalError("""
+                🛑 无法加载 \(named) 请检查:
+                1. Bundle 结构是否符合组件化规范
+                2. 是否在正确的 Target 中添加资源文件
+                """)
+            #else
+            return nil
+            #endif
+        }
+        return UINib(nibName: named, bundle: bundle)
     }
     
     // MARK: 本地化扩展
