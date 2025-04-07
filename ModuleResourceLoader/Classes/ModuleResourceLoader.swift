@@ -129,18 +129,22 @@ public final class ModuleResourceLoader {
     }
     
     // MARK: 本地化扩展
-    public static func localizedString(forKey key: String,
+    public static func localizedString(language: String,
+                                       forKey key: String,
                                        table: String? = nil,
                                        comment: String = "",
                                        for type: Any.Type) -> String {
-        return localizedString(forKey: key, table: table, comment: comment, forModule: moduleName(for: type))
+        return localizedString(language: language, forKey: key, table: table, comment: comment, forModule: moduleName(for: type))
     }
     
-    public static func localizedString(forKey key: String,
+    public static func localizedString(language: String,
+                                       forKey key: String,
                                        table: String? = nil,
                                        comment: String = "",
                                        forModule module: String) -> String {
-        guard let bundle = currentBundle(for: module) else {
+        guard let currentBundle = currentBundle(for: module),
+              let path = currentBundle.path(forResource: language, ofType: "lproj"),
+              let bundle = Bundle(path: path) else {
             #if DEBUG
             fatalError("🛑 模块 \(module) 本地化 Bundle 配置错误")
             #endif
