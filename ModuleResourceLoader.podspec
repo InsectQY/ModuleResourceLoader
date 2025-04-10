@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ModuleResourceLoader'
-  s.version          = '1.2.1'
+  s.version          = '1.2.2'
   s.summary          = 'iOS Module resource loading tool'
   s.description      = <<-DESC
   iOS Module resource loading tool (supports dynamic and static libraries)

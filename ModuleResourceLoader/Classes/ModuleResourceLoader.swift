@@ -61,8 +61,9 @@ public final class ModuleResourceLoader {
         guard let bundle = currentBundle(for: module) else {
             #if DEBUG
             fatalError("🛑 模块 \(module) 未正确配置资源 Bundle")
-            #endif
+            #else
             return nil
+            #endif
         }
         return UIImage(named: imageName, in: bundle, compatibleWith: nil)
     }
@@ -82,12 +83,20 @@ public final class ModuleResourceLoader {
     ///   - module: 模块名称
     /// - Returns: T
     public static func loadViewFromNib<T: UIView>(withClass name: T.Type, forModule module: String) -> T {
-        let named = String(describing: name)
+        return loadViewFromNib(withClassName: String(describing: name), forModule: module)
+    }
+    
+    /// 加载 UIView 类型的 Xib (高性能版本)
+    /// - Parameters:
+    ///   - name: 类名
+    ///   - module: 模块名称
+    /// - Returns: T
+    public static func loadViewFromNib<T: UIView>(withClassName name: String, forModule module: String) -> T {
         guard let bundle = currentBundle(for: module),
-              let view = bundle.loadNibNamed(String(describing: name), owner: nil)?.first as? T else {
+              let view = bundle.loadNibNamed(name, owner: nil)?.first as? T else {
             #if DEBUG
             fatalError("""
-                🛑 无法加载 \(named) 请检查:
+                🛑 无法加载 \(name) 请检查:
                 1. XIB 文件名是否与模板名称一致
                 2. Bundle 结构是否符合组件化规范
                 3. 是否在正确的 Target 中添加资源文件
@@ -112,12 +121,19 @@ public final class ModuleResourceLoader {
     ///   - module: 模块名称
     /// - Returns: UINib
     public static func loadNib<T: UIView>(withClass name: T.Type, forModule module: String) -> UINib? {
-        let named = String(describing: name)
-        guard let bundle = currentBundle(for: module),
-              let view = bundle.loadNibNamed(String(describing: name), owner: nil)?.first as? T else {
+        return loadNib(withClassName: String(describing: name), forModule: module)
+    }
+    
+    /// 加载 UINib (根据类名获取)
+    /// - Parameters:
+    ///   - name: 类名
+    ///   - module: 模块名
+    /// - Returns: UINib
+    public static func loadNib(withClassName name: String, forModule module: String) -> UINib? {
+        guard let bundle = currentBundle(for: module) else {
             #if DEBUG
             fatalError("""
-                🛑 无法加载 \(named) 请检查:
+                🛑 无法加载 \(name) 请检查:
                 1. Bundle 结构是否符合组件化规范
                 2. 是否在正确的 Target 中添加资源文件
                 """)
@@ -125,7 +141,7 @@ public final class ModuleResourceLoader {
             return nil
             #endif
         }
-        return UINib(nibName: named, bundle: bundle)
+        return UINib(nibName: name, bundle: bundle)
     }
     
     // MARK: 本地化扩展
@@ -147,8 +163,9 @@ public final class ModuleResourceLoader {
               let bundle = Bundle(path: path) else {
             #if DEBUG
             fatalError("🛑 模块 \(module) 本地化 Bundle 配置错误")
-            #endif
+            #else
             return key
+            #endif
         }
         return bundle.localizedString(forKey: key, value: nil, table: table)
     }
